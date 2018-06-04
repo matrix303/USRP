@@ -1,0 +1,337 @@
+#:kivy 1.10.0
+#:import SlideTransition kivy.uix.screenmanager.SlideTransition
+#:import MeshLinePlot kivy.garden.graph.MeshLinePlot
+
+ScreenManagement:
+    SetupScreen:
+    HomeScreen:
+    ManualScreen:
+    SettingsScreen:
+
+<VialButton>:
+    color: 1,1,1,1 # white
+    font_size: 20
+    size_hint: 0.111, 0.05 # width, height
+
+<MainButton>:
+    font_size: 18
+    size_hint: 0.2, 0.1 # width, height
+
+<DataLabel>:
+    text_size: self.size
+    halign: 'left'
+    valign: 'middle'
+
+<SetupScreen>:
+    name: 'setup'
+
+    FloatLayout:
+
+        Label:
+            text: "CHEMOSTAT GUI"
+            bold: True
+            pos_hint: {'x': 0, 'y': 0.40}
+            font_size: 60
+
+        Button:
+            text: "Setup"
+            background_color: 0,0.8,0,1 # green
+            pos_hint: {"x": 0.3, 'y':0.4}
+            font_size: 60
+            size_hint: 0.4, 0.2 # width, height
+            on_release:
+                root.setup_process()
+                app.root.transition = SlideTransition(direction ='up')
+                app.root.current = 'home'
+
+        ProgressBar:
+            id: setup_progress
+            pos_hint: {'x': 0, 'y': -0.30}
+            max: 100
+            value: 0
+
+        Label:
+            id: progress_number
+            pos_hint: {'x': 0, 'y': -0.20}
+            text: '0'
+
+<HomeScreen>:
+    name: 'home'
+
+    FloatLayout:
+
+        Label:
+            text: "Home"
+            bold: True
+            pos_hint: {'x': -0.45, 'y': 0.45}
+            font_size: 30
+
+        BoxLayout:
+            canvas:
+                Color:
+                    rgba: [0,0,0,1]
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            size_hint: [0.74, 0.5]
+            pos_hint: {'x': 0.02, 'y': 0.4}
+            Graph:
+                id: graph
+                #background_color = [1,0,0,1]
+                xlabel: "Time"
+                ylabel: "Level"
+
+        GridLayout:
+            padding: [50, 10] # [horizontal, vertical]
+            canvas:
+                Color:
+                    rgba: [0,0,0,1]
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            size_hint: [0.74, 0.31]
+            pos_hint: {'x': 0.02, 'y': 0.07}
+            cols: 4
+            rows: 5
+            DataLabel:
+                #text_size: self.size
+                #halign: 'left'
+                text: "Vial:"
+            DataLabel:
+                id: vial_number
+                text: "0"
+            DataLabel:
+                text:"LED:"
+                color: [1, 1, 0, 1]
+            DataLabel:
+                id: led
+                text: "OFF"
+            DataLabel:
+                text: "Temperature (Degrees C):"
+                color: [1, 0, 0, 1]
+            DataLabel:
+                id: temperature
+            DataLabel:
+                text: "Peltier:"
+                color: [1, 0, 0.5, 1]
+            DataLabel:
+                id: peltier
+                text: "OFF"
+            DataLabel:
+                text: "Temperature Set Point:"
+                color: [0.7, 0, 0, 1]
+            DataLabel:
+                id: temp_set
+            DataLabel:
+                text: "Stir Fan:"
+                color: [0, 1, 0, 1]
+            DataLabel:
+                id: stir
+                text: "OFF"
+            DataLabel:
+                text: "OD:"
+                color: [1, 0.5, 0, 1]
+            DataLabel:
+                id: od
+            DataLabel:
+                text: "Pump in:"
+                color: [0, 0, 1, 1]
+            DataLabel:
+                id: pump_in
+                text: "OFF"
+            DataLabel:
+                text: "OD Set Point:"
+                color: [0.7, 0.3, 0, 1]
+            DataLabel:
+                id: od_set
+            DataLabel:
+                text: "Pump out:"
+                color: [0, 1, 1, 1]
+            DataLabel:
+                id: pump_out
+                text: "OFF"
+
+
+
+        MainButton:
+            id: experiment_button
+            text: "Start Experiment"
+            background_color: [0,0.8,0,1] # green
+            pos_hint: {"x": 0.78, 'y':0.80}
+            on_release: root.toggle_exp()
+
+        MainButton:
+            text: "Manual Mode"
+            background_color: 0.9,0.9,0,1 # yellow
+            pos_hint: {"x": 0.78, 'y':0.68}
+            on_release:
+                app.root.transition = SlideTransition(direction = 'left')
+                app.root.current = 'manual'
+
+        MainButton:
+            text: 'Settings'
+            pos_hint: {"x": 0.78, 'y':0.56}
+            on_release:
+                app.root.transition = SlideTransition(direction = 'up')
+                app.root.current = 'settings'
+
+        MainButton:
+            text: 'Return to Setup'
+            on_release:
+                app.root.transition = SlideTransition(direction = 'down')
+                app.root.current = 'setup'
+            pos_hint: {"x": 0.78, 'y':0.44}
+
+        MainButton:
+            text: 'Exit Program'
+            on_release: app.stop()
+            pos_hint: {"x": 0.78, 'y':0.32}
+
+        VialButton:
+            text: "Vial 0"
+            pos_hint: {"x": 0, 'y':0}
+            on_release: root.vial(0)
+
+        VialButton:
+            text: "Vial 1"
+            pos_hint: {"x": 0.111, 'y':0}
+            on_release: root.vial(1)
+
+        VialButton:
+            text: "Vial 2"
+            pos_hint: {"x": 0.222, 'y':0}
+            on_release: root.vial(2)
+
+        VialButton:
+            text: "Vial 3"
+            pos_hint: {"x": 0.333, 'y':0}
+            on_release: root.vial(3)
+
+        VialButton:
+            text: "Vial 4"
+            pos_hint: {"x": 0.444, 'y':0}
+            on_release: root.vial(4)
+
+        VialButton:
+            text: "Vial 5"
+            pos_hint: {"x": 0.555, 'y':0}
+            on_release: root.vial(5)
+
+        VialButton:
+            text: "Vial 6"
+            pos_hint: {"x": 0.666, 'y':0}
+            on_release: root.vial(6)
+
+        VialButton:
+            text: "Vial 7"
+            pos_hint: {"x": 0.777, 'y':0}
+            on_release: root.vial(7)
+
+        VialButton:
+            text: "Vial 8"
+            pos_hint: {"x": 0.888, 'y':0}
+            on_release: root.vial(8)
+
+<ManualScreen>:
+    name: 'manual'
+
+    FloatLayout:
+
+        Label:
+            text: "Manual Mode"
+            bold: True
+            pos_hint: {'x': -0.40, 'y': 0.45}
+            font_size: 30
+
+        MainButton:
+            text: "Home"
+            pos_hint: {"x": 0.78, 'y':0.76}
+            on_release:
+                app.root.transition = SlideTransition(direction = 'right')
+                app.root.current = 'home'
+
+        MainButton:
+            text: "Heater"
+            pos_hint: {"x": 0.78, 'y':0.64}
+
+        MainButton:
+            text: "Stir"
+            pos_hint: {"x": 0.78, 'y':0.52}
+
+        MainButton:
+            text: "Pump in"
+            pos_hint: {"x": 0.78, 'y':0.40}
+            size_hint: [0.095,0.1]
+
+        MainButton:
+            text: "Pump out"
+            pos_hint: {"x": 0.885, 'y':0.40}
+            size_hint: [0.095,0.1]
+
+        MainButton:
+            text: "Measure OD"
+            pos_hint: {"x": 0.78, 'y':0.28}
+
+<SettingsScreen>:
+    name: 'settings'
+
+    FloatLayout:
+
+        Label:
+            text: "Settings"
+            bold: True
+            pos_hint: {'x': -0.45, 'y': 0.45}
+            font_size: 30
+
+        MainButton:
+            text: 'Home'
+            on_release:
+                app.root.transition = SlideTransition(direction = 'down')
+                app.root.current = 'home'
+            pos_hint: {'x': 0.78, 'y': 0.64}
+
+        MainButton:
+            text: 'Kivy Settings'
+            on_release: app.open_settings()
+            pos_hint: {'x': 0.78, 'y': 0.52}
+
+        MainButton:
+            text: 'Exit Program'
+            on_release: app.stop()
+            pos_hint: {"x": 0.78, 'y':0.40}
+
+        VialButton:
+            text: "Vial 0"
+            pos_hint: {"x": 0, 'y':0}
+
+        VialButton:
+            text: "Vial 1"
+            pos_hint: {"x": 0.111, 'y':0}
+
+        VialButton:
+            text: "Vial 2"
+            pos_hint: {"x": 0.222, 'y':0}
+
+        VialButton:
+            text: "Vial 3"
+            pos_hint: {"x": 0.333, 'y':0}
+
+        VialButton:
+            text: "Vial 4"
+            pos_hint: {"x": 0.444, 'y':0}
+
+        VialButton:
+            text: "Vial 5"
+            pos_hint: {"x": 0.555, 'y':0}
+
+        VialButton:
+            text: "Vial 6"
+            pos_hint: {"x": 0.666, 'y':0}
+
+        VialButton:
+            text: "Vial 7"
+            pos_hint: {"x": 0.777, 'y':0}
+
+        VialButton:
+            text: "Vial 8"
+            pos_hint: {"x": 0.888, 'y':0}
