@@ -40,9 +40,7 @@ ScreenManagement:
             font_size: 60
             size_hint: 0.4, 0.2 # width, height
             on_release:
-                root.setup_process()
-                app.root.transition = SlideTransition(direction ='up')
-                app.root.current = 'home'
+                root.progress_start()
 
         ProgressBar:
             id: setup_progress

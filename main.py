@@ -6,9 +6,10 @@
 # __init__.py and add False to line 176:
 # 'self._fbo = Fbo(size=self.size, with_stencilbuffer=False)
 
+
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 from kivy.core.window import Window
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
@@ -21,6 +22,7 @@ from time import sleep
 from kivy.uix.progressbar import ProgressBar
 
 exp_pressed = 0 # 1 when experiment is running, 0 when stopped
+
 
 def get_data():
     data = 0
@@ -38,11 +40,23 @@ def get_data():
 
 class SetupScreen(Screen):
 
-    def setup_process(self):
-        progress = self.ids.setup_progress
-        for x in range(100):
-            progress.value = progress.value + 1
-            sleep(0.05)
+    #start progress bar by initiating clock schedule
+    def progress_start(self):
+        Clock.schedule_interval(self.progress_loop,1/60) #runs function every 1/60 sec
+
+    #progress bar schedule function
+    def progress_loop(self, dt):
+        setup_progress = self.ids.setup_progress
+
+        #Check if progress bar is @ max; if not increass progress by 1
+        if setup_progress.value >= setup_progress.max:
+            Clock.unschedule(self.progress_loop) #Stops loop
+            #Transition to another Screen
+
+            App.get_running_app().transition = SlideTransition(direction = 'up')
+            App.get_running_app().root.current = 'home'
+            return False
+        setup_progress.value += 1
 
 class HomeScreen(Screen):
 
@@ -74,12 +88,14 @@ class HomeScreen(Screen):
             self.ids.graph.add_plot(self.stir_plot)
             self.ids.graph.add_plot(self.mot_in_plot)
             self.ids.graph.add_plot(self.mot_out_plot)
-            Clock.schedule_interval(self.get_value, 0.2) # starts plotting values
+            self.event = Clock.schedule_interval(self.get_value, 0.2) # starts plotting values
+
         else:
             exp_pressed = 0
             exp.background_color = [0,0.8,0,1]
             exp.text = "Start Experiment"
-            Clock.unschedule(self.get_value)
+            self.event.cancel()
+
 
     def get_value(self, dt):
         self.temp_plot.points = [(i, j) for i, j in enumerate(levels)]
