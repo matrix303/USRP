@@ -39,8 +39,7 @@ ScreenManagement:
             pos_hint: {"x": 0.3, 'y':0.4}
             font_size: 60
             size_hint: 0.4, 0.2 # width, height
-            on_release:
-                root.progress_start()
+            on_release: root.progress_start()
 
         ProgressBar:
             id: setup_progress
@@ -149,8 +148,6 @@ ScreenManagement:
                 id: pump_out
                 text: "OFF"
 
-
-
         MainButton:
             id: experiment_button
             text: "Start Experiment"
@@ -162,22 +159,17 @@ ScreenManagement:
             text: "Manual Mode"
             background_color: 0.9,0.9,0,1 # yellow
             pos_hint: {"x": 0.78, 'y':0.68}
-            on_release:
-                app.root.transition = SlideTransition(direction = 'left')
-                app.root.current = 'manual'
+            on_release: root.go_manual()
 
         MainButton:
             text: 'Settings'
             pos_hint: {"x": 0.78, 'y':0.56}
-            on_release:
-                app.root.transition = SlideTransition(direction = 'up')
-                app.root.current = 'settings'
+            on_release: root.go_setting()
 
         MainButton:
             text: 'Return to Setup'
             on_release:
-                app.root.transition = SlideTransition(direction = 'down')
-                app.root.current = 'setup'
+                root.go_setup(root.manager)
             pos_hint: {"x": 0.78, 'y':0.44}
 
         MainButton:
@@ -244,9 +236,7 @@ ScreenManagement:
         MainButton:
             text: "Home"
             pos_hint: {"x": 0.78, 'y':0.76}
-            on_release:
-                app.root.transition = SlideTransition(direction = 'right')
-                app.root.current = 'home'
+            on_release: root.go_home()
 
         MainButton:
             text: "Heater"

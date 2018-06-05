@@ -6,7 +6,6 @@
 # __init__.py and add False to line 176:
 # 'self._fbo = Fbo(size=self.size, with_stencilbuffer=False)
 
-
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
@@ -20,9 +19,18 @@ from threading import Thread
 from kivy.clock import Clock
 from time import sleep
 from kivy.uix.progressbar import ProgressBar
+# import sys, serial, argparse
+import numpy as np
+from collections import deque
+from multiprocessing import Queue, Process
+from Queue import Empty
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+# import serial.tools.list_ports
+import math
 
 exp_pressed = 0 # 1 when experiment is running, 0 when stopped
-
 
 def get_data():
     data = 0
@@ -37,6 +45,7 @@ def get_data():
             levels.pop()
         levels.insert(0, data)
         sleep(0.2)
+
 
 class SetupScreen(Screen):
 
@@ -53,10 +62,13 @@ class SetupScreen(Screen):
             Clock.unschedule(self.progress_loop) #Stops loop
             #Transition to another Screen
 
-            App.get_running_app().transition = SlideTransition(direction = 'up')
-            App.get_running_app().root.current = 'home'
+            self.go_home()
             return False
         setup_progress.value += 1
+
+    def go_home(self):
+        App.get_running_app().transition = SlideTransition(direction = 'up')
+        App.get_running_app().root.current = 'home'
 
 class HomeScreen(Screen):
 
@@ -112,8 +124,23 @@ class HomeScreen(Screen):
         vial_label = self.ids.vial_number
         vial_label.text = str(vial_number)
 
+    def go_setup(self, root_manager):
+        root_manager.get_screen('setup').ids.setup_progress.value = 0
+        App.get_running_app().transition = SlideTransition(direction = 'down')
+        App.get_running_app().root.current = 'setup'
+
+    def go_manual(self):
+        App.get_running_app().transition = SlideTransition(direction = 'left')
+        App.get_running_app().root.current = 'manual'
+
+    def go_setting(self):
+        App.get_running_app().transition = SlideTransition(direction = 'up')
+        App.get_running_app().root.current = 'settings'
+
 class ManualScreen(Screen):
-    pass
+    def go_home(self):
+        App.get_running_app().transition = SlideTransition(direction = 'right')
+        App.get_running_app().root.current = 'settings'
 
 class SettingsScreen(Screen):
     pass
@@ -130,7 +157,7 @@ class MainButton(Button):
 class DataLabel(Label):
     pass
 
-class MainApp(App):
+class Main_KivyApp(App):
     pass
 
 if __name__ == "__main__":
@@ -138,4 +165,4 @@ if __name__ == "__main__":
     get_data_thread = Thread(target = get_data)
     get_data_thread.daemon = True
     get_data_thread.start()
-    MainApp().run()
+    Main_KivyApp().run()
